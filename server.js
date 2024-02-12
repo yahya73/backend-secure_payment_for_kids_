@@ -4,7 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { notFoundError } from "./middlewares/error-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
-import testRoutes from "./routes/testRouter.js";
+import Routes from "./routes/Routes.js";
 
 
 // Creating an express app
@@ -47,7 +47,7 @@ app.use('/img', express.static('public/images'));
 
 
 // Importing the routes for the 'tests' resource
-app.use('/tests', testRoutes);
+app.use('/tests', Routes);
 
 // Using custom middleware for handling 404 errors
 app.use(notFoundError);
