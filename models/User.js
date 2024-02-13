@@ -42,10 +42,15 @@ const UserSchema = new Schema({
         type: String,
        
     },
-ProhibitedProductTypes:{
-    type: [String],
-       
-}
+    ProhibitedProductTypes:{
+        type: [String],
+        
+    },
+    Verified: {
+        type: Boolean,
+        required: true
+    }
+
 });
 
 // Creating and exporting the 'Test' model using the defined schema
