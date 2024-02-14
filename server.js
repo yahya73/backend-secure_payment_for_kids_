@@ -48,7 +48,7 @@ app.use('/img', express.static('public/images'));
 
 
 // Importing the routes for the 'tests' resource
-app.use('/tests', Routes);
+app.use('/api', Routes);
 app.use('/partenaire', PartenaireRoutes)
 
 // Using custom middleware for handling 404 errors
