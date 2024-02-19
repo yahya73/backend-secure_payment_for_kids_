@@ -8,7 +8,7 @@ import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js"
 import ParentRoutes from './routes/parentRoutes.js'
 import dotenv from 'dotenv';
-
+import user from './routes/UserRoutes.js';
 // Creating an express app
 const app = express();
 
@@ -53,6 +53,7 @@ app.use('/tests', Routes);
 app.use('/partenaire', PartenaireRoutes)
 app.use('/parent', ParentRoutes)
 
+app.use('/',user);
 // Using custom middleware for handling 404 errors
 app.use(notFoundError);
 
