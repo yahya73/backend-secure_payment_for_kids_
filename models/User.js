@@ -40,12 +40,18 @@ const UserSchema = new Schema({
     },
     Adressblockchain:{
         type: String,
+        required: true
        
     },
-ProhibitedProductTypes:{
-    type: [String],
-       
-}
+    ProhibitedProductTypes:{
+        type: [String],
+        
+    },
+    Verified: {
+        type: Boolean,
+        required: true
+    }
+
 });
 
 // Creating and exporting the 'Test' model using the defined schema

@@ -5,15 +5,17 @@ import cors from "cors";
 import { notFoundError } from "./middlewares/error-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import Routes from "./routes/Routes.js";
-
+import PartenaireRoutes from "./routes/partenaireRoutes.js"
+import ParentRoutes from './routes/parentRoutes.js'
+import dotenv from 'dotenv';
 
 // Creating an express app
 const app = express();
 
+dotenv.config();
 // Setting the port number for the server (default to 9090 if not provided)
 const PORT = 9090 || process.env.PORT;
-
-
+const databaseName = 'PIM';
 
 // Enabling debug mode for mongoose
 mongoose.set('debug', true);
@@ -22,7 +24,7 @@ mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
 
 // Connecting to the MongoDB database
-mongoose.connect(`mongodb+srv://localhost:GWaB8yrPjyl265Vw@paymentforkids.vliqoot.mongodb.net/`)
+mongoose.connect(`mongodb+srv://localhost:GWaB8yrPjyl265Vw@paymentforkids.vliqoot.mongodb.net/${databaseName}`)
     .then(() => {
         console.log(`Connected to  db`);
     })
@@ -48,6 +50,8 @@ app.use('/img', express.static('public/images'));
 
 // Importing the routes for the 'tests' resource
 app.use('/tests', Routes);
+app.use('/partenaire', PartenaireRoutes)
+app.use('/parent', ParentRoutes)
 
 // Using custom middleware for handling 404 errors
 app.use(notFoundError);
@@ -57,5 +61,5 @@ app.use(errorHandler);
 
 // Starting the server and listening on the specified port
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running at http://localhost:${PORT}/`);
 });
