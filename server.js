@@ -6,6 +6,8 @@ import { notFoundError } from "./middlewares/error-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js"
+import ProductRoutes from "./routes/ProductRoutes.js";
+
 import dotenv from 'dotenv';
 
 // Creating an express app
@@ -50,6 +52,8 @@ app.use('/img', express.static('public/images'));
 // Importing the routes for the 'tests' resource
 app.use('/api', Routes);
 app.use('/partenaire', PartenaireRoutes)
+app.use('/api', ProductRoutes);
+
 
 // Using custom middleware for handling 404 errors
 app.use(notFoundError);
