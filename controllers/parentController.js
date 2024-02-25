@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer'; // Import nodemailer for sending emails
 import { google } from 'googleapis';
 import { Client, PrivateKey, AccountCreateTransaction, AccountBalanceQuery, Hbar, Mnemonic } from "@hashgraph/sdk";
+import { sendVerificationEmail } from './EmailVerificationController.js'
+
 
 export const registerParent = async (req, res) => {
     try {
@@ -155,53 +157,6 @@ export const getAccountDetails = async (req, res) => {
     } catch (error) {
         console.error("Error fetching account details:", error);
         res.status(500).json({ message: "Error fetching account details" });
-    }
-};
-
-
-
-
-//Email
-const sendVerificationEmail = async (email, username) => {
-    try {
-
-        const oAuth2Client = new google.auth.OAuth2(
-            process.env.CLIENT_ID,
-            process.env.CLIENT_SECRET,
-            "https://developers.google.com/oauthplayground"
-          );
-        oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
-
-        const ACCESS_TOKEN = await oAuth2Client.getAccessToken();
-        console.log("Access token:", ACCESS_TOKEN);
-
-        // Create nodemailer transporter with OAuth2 authentication
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                type: "OAuth2",
-                user: process.env.EMAIL_USER,
-                clientId: process.env.CLIENT_ID,
-                clientSecret: process.env.CLIENT_SECRET,
-                refreshToken: process.env.REFRESH_TOKEN,
-                accessToken: ACCESS_TOKEN,
-            },
-        });
-
-        // Define email options
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Verification Email',
-            html: `Hey ${username}, click <a href="http://localhost:9090/partenaire/verifyEmail/${email}">here</a> to verify your email.`,
-        };
-
-        // Send the email
-        await transporter.sendMail(mailOptions);
-        console.log("Verification email sent successfully.");
-    } catch (error) {
-        console.error("Error sending verification email:", error);
-        throw new Error("Error sending verification email.");
     }
 };
 

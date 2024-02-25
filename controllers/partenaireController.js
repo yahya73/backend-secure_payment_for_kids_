@@ -35,18 +35,20 @@ export const registerPartenaire = async (req, res) => {
             Verified : false
         });
 
+        console.log("aaaaaa")
+
         const partenaire = await newPartenaire.save();
 
-        const token = jwt.sign(
-            { username: partenaire.Username, id: partenaire._id },
-            process.env.JWT_KEY,
-            { expiresIn: "1h" }
-        );        
+        // const token = jwt.sign(
+        //     { username: partenaire.Username, id: partenaire._id },
+        //     process.env.JWT_KEY,
+        //     { expiresIn: "1h" }
+        // );        
 
         // Send verification email
-        await sendVerificationEmail(Email, Username);
+        // await sendVerificationEmail(Email, Username);
 
-        res.status(200).json({ partenaire, token });
+        res.status(200).json({ partenaire });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

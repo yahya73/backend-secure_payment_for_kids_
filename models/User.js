@@ -40,7 +40,6 @@ const UserSchema = new Schema({
     },
     Adressblockchain:{
         type: String,
-        required: true
        
     },
     ProhibitedProductTypes:{
