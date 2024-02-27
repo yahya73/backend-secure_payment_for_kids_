@@ -15,6 +15,7 @@ export function addOnce(req, res) {
             // Extracting product details from the request body
             SellerId: req.body.SellerId,
             ProductName: req.body.ProductName,
+            image:req.body.image,
             Description: req.body.Description,
             Price: req.body.Price,
             Type: req.body.Type
@@ -24,6 +25,7 @@ export function addOnce(req, res) {
                 res.status(201).json({
                     SellerId: newProduct.SellerId,
                     ProductName: newProduct.ProductName,
+
                     Description: newProduct.Description,
                     Price: newProduct.Price,
                     Type: newProduct.Type

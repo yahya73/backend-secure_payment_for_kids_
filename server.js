@@ -7,10 +7,8 @@ import { errorHandler } from "./middlewares/error-handler.js";
 import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js"
 import ProductRoutes from "./routes/ProductRoutes.js";
-
+import PaymentRoutes from "./routes/payment.js";
 import dotenv from 'dotenv';
-
-// Creating an express app
 const app = express();
 
 dotenv.config();
@@ -53,6 +51,7 @@ app.use('/img', express.static('public/images'));
 app.use('/api', Routes);
 app.use('/partenaire', PartenaireRoutes)
 app.use('/api', ProductRoutes);
+app.use('/api',PaymentRoutes);
 
 
 // Using custom middleware for handling 404 errors
