@@ -5,14 +5,16 @@ import nodemailer from 'nodemailer'; // Import nodemailer for sending emails
 import { google } from 'googleapis';
 import { Client, PrivateKey, AccountCreateTransaction, AccountBalanceQuery, Hbar, Mnemonic } from "@hashgraph/sdk";
 import { sendVerificationEmail } from './EmailVerificationController.js'
-
-
+import { decryptText,encryptText,createchildinblockchain,transformString } from "./UserController.js";
+import {
+    HDNode as ethersHdNode,
+  } from '@ethersproject/hdnode';
 export const registerParent = async (req, res) => {
     try {
         const { Username, Email, Password, PhoneNumber } = req.body;
 
-        const { accountId, mnemonic, balance} = await createHederaAccount();
-
+       // const { accountId, mnemonic, balance} = await createHederaAccount();
+      
         // Vérifier si le partenaire existe déjà
         const existingParent = await UserModel.findOne({ Username });
 
@@ -27,7 +29,8 @@ export const registerParent = async (req, res) => {
         }  
 
         const hashedPassword = await bcrypt.hash(Password, 10);
-
+        const {privateKey, accountId} =  await  createchildinblockchain();
+        
         const newParent = new UserModel({
             Username,
             Email,
@@ -41,16 +44,29 @@ export const registerParent = async (req, res) => {
         });
 
         const parent = await newParent.save();
+       
+        const key =  await transformString(newParent.Username);
+        const encrypted = encryptText(privateKey,key);
 
+      
+       const decrypted = decryptText(encrypted.encryptedText,encrypted.iv,key);
+        res.json({
+            key:key,
+            encrypted:encrypted.encryptedText,
+            privatekey:privateKey.toString(),
+            decrypted :decrypted,
+            iv:encrypted.iv,
+            parent
+        });
         // const token = jwt.sign(
         //     { username: parent.Username, id: parent._id },
         //     process.env.JWT_KEY,
         //     { expiresIn: "1h" }
         // );        
 
-        await sendVerificationEmail(Email, Username);
+       // await sendVerificationEmail(Email, Username);
 
-        res.status(200).json({ parent, mnemonic: mnemonic });
+       // res.status(200).json({ parent, mnemonic: mnemonic });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -62,15 +78,29 @@ const generateMnemonic = () => {
 };
 
 // Function to generate keys from a mnemonic phrase
-const generateKeysFromMnemonic = (mnemonic) => {
-    const privateKey = Ed25519PrivateKey.fromMnemonic(mnemonic);
+export async function generateKeysFromMnemonic(mnemonic)  {
+   /* const hdNodeRoot = ethersHdNode.fromMnemonic(mnemonic);
+    const accountHdPath = `m/44'/60'/0'/0/0`;
+    const hdNode = hdNodeRoot.derivePath(accountHdPath);
+  */
+ 
+ const memonic2 = await Mnemonic.fromString(mnemonic.toString());
+
+const privateKey = await memonic2.toStandardEd25519PrivateKey();
+    // At this point the account technically does not yet exist,
+    // and will need to be created when it receives its first transaction (later).
+    // Convert the private key to string format as well as an EVM address.
+    //const privateKey = PrivateKey.fromStringECDSA(hdNode.privateKey);
+   // const privateKey = Mnemonic.fromString(mnemonic).toPrivateKey();
     const publicKey = privateKey.publicKey;
+    
     return { privateKey, publicKey };
 };
 
 // Function to reset keys and return the new keys and phrase
 const resetKeys = () => {
-    const mnemonic = Mnemonic.generate();
+    const mnemonic = Mnemonic.generate12();
+    
     const { privateKey, publicKey } = generateKeysFromMnemonic(mnemonic);
     return { mnemonic, privateKey, publicKey };
 };
@@ -113,9 +143,7 @@ export const createHederaAccount = async () => {
         let bcAccountId = "" + newAccountId
         // Generate mnemonic phrase for the new account
         const mnemonic = generateMnemonic();
-        console.log("account id : " ,bcAccountId)
-        console.log(await(mnemonic))
-        console.log("balance : ", accountBalance.hbars.toTinybars().toString() )
+       
 
         return { accountId: bcAccountId, mnemonic: await(mnemonic), balance: accountBalance.hbars.toTinybars().toString() };
     } catch (error) {

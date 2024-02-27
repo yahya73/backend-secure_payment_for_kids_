@@ -1,8 +1,8 @@
 import User from "../models/User.js";
 import bcrypt from 'bcrypt';
 import {validationResult} from "express-validator";
+import {generateKeysFromMnemonic} from './parentController.js'
 
-import User from '../models/User.js';
 import {
     AccountId,
     PrivateKey,
@@ -10,6 +10,7 @@ import {
     AccountBalanceQuery,
     AccountInfoQuery,
     TransferTransaction,
+    Mnemonic
   } from "@hashgraph/sdk";
   import dotenv from 'dotenv';
   dotenv.config();
@@ -133,14 +134,18 @@ export function unbanUser(req, res) {
     }
 }
 
-async function createchildinblockchain(){
+export async function createchildinblockchain(){
     
     console.log('- Creating a new account...\n');
-    const privateKey = PrivateKey.generateECDSA();
+   /* const privateKey = PrivateKey.generateECDSA();
       console.log("private"+privateKey);
-    const publicKey = privateKey.publicKey;
+    const publicKey = privateKey.publicKey;*/
     // Assuming that the target shard and realm are known.
     // For now they are virtually always 0 and 0.
+    const mnemonic = await Mnemonic.generate12();
+  
+    const { privateKey, publicKey } = await  generateKeysFromMnemonic(mnemonic);
+   
     const aliasAccountId = publicKey.toAccountId(0, 0);
     console.log(`- New account ID: ${aliasAccountId.toString()}`);
     if (aliasAccountId.aliasKey === null) {
@@ -193,16 +198,17 @@ export  async function createChild(req, res) {
       
       child.Adressblockchain = accountId.toString();
         const childcreated = await User.create(child);
-        console.log(childcreated)
+        
       const key =  await transformString(childcreated.Username);
-       const encrypted = encryptText(privateKey,key);
-       console.log(encrypted)
+       const {iv,encrypted} = encryptText(privateKey,key);
+    
        const decrypted = decryptText(encrypted.encryptedText,encrypted.iv,key);
         res.json({
             key:key,
             encrypted:encrypted.encryptedText,
             privatekey:privateKey.toString(),
-            decrypted :decrypted
+            decrypted :decrypted,
+            iv:iv
         });
    
     } catch (error) {
@@ -244,10 +250,10 @@ async function getAccountIdByAlias (client, aliasAccountId){
     const accountInfo = await new AccountInfoQuery()
         .setAccountId(aliasAccountId)
         .execute(client);
-    console.log("accountinfo:" + accountInfo);
+   
     return accountInfo.accountId;
 }
-async function sendToken(client, tokenId, owner, aliasAccountId, sendBalance, treasuryAccPvKey) {
+export async function sendToken(client, tokenId, owner, aliasAccountId, sendBalance, treasuryAccPvKey) {
     const tokenTransferTx = new TransferTransaction()
         .addTokenTransfer(tokenId, owner, -sendBalance)
         .addTokenTransfer(tokenId, aliasAccountId, sendBalance)
@@ -260,7 +266,7 @@ async function sendToken(client, tokenId, owner, aliasAccountId, sendBalance, tr
     // Get transaction receipt information
     await tokenTransferSubmit.getReceipt(client);
 }
-async function transformString(input) {
+export async function transformString(input) {
     if (input.length <= 6) {
         return input; // If the input length is 6 or less, return the input as is
     }
@@ -311,10 +317,10 @@ try {
     console.log(error)
 }
 }
-function encryptText(text, key) {
+export function encryptText(text, key) {
     try{
       let  keybytes = Buffer.from(key, 'utf-8');
-      console.log(keybytes.length);
+     // console.log(keybytes.length);
         if (keybytes.length > 32) {
             // Truncate the key if it's longer than 32 bytes
            keybytes= keybytes.subarray(0, 32);
@@ -335,7 +341,7 @@ function encryptText(text, key) {
 }
 
 // Function to decrypt an encrypted string using a key and initialization vector (iv)
-function decryptText(encryptedText, iv, key) {
+export function decryptText(encryptedText, iv, key) {
   let  keybytes = Buffer.from(key, 'utf-8');
     if (keybytes.length > 32) {
         // Truncate the key if it's longer than 32 bytes
