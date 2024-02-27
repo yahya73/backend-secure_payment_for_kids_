@@ -19,3 +19,21 @@ router.route('/users/unban/:id')
    
 // Exporting the router for use in other modules
 export default router;
+import express from 'express';
+import { body } from 'express-validator';
+import multer from '../middlewares/multer-config.js';
+import {createChild,getAllChildren,getAllChildrenByParentId,deleteChildById} from '../controllers/UserController.js'
+const router = express.Router();
+
+// Handling routes for the '/tests' endpoint
+
+router.post("/child/add", createChild);
+
+router.get("/child/getallchildren", getAllChildren);
+router.get("/child/getallchildrenbyparent/:parentid", getAllChildrenByParentId);
+router.delete("/child/deletechildbyid", deleteChildById);
+
+    // Handling GET requests to retrieve all tests
+   
+// Exporting the router for use in other modules
+export default router;
