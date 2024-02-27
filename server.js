@@ -21,8 +21,8 @@ mongoose.set('debug', true);
 // Setting the global Promise library
 mongoose.Promise = global.Promise;
 
-// Connecting to the MongoDB database
-mongoose.connect(`mongodb+srv://localhost:GWaB8yrPjyl265Vw@paymentforkids.vliqoot.mongodb.net/`)
+//`mongodb+srv://localhost:GWaB8yrPjyl265Vw@paymentforkids.vliqoot.mongodb.net/`
+mongoose.connect(`mongodb://localhost:27017/kidscoin`)
     .then(() => {
         console.log(`Connected to  db`);
     })
@@ -47,7 +47,7 @@ app.use('/img', express.static('public/images'));
 
 
 // Importing the routes for the 'tests' resource
-app.use('/tests', testRoutes);
+app.use('/api', Routes);
 
 // Using custom middleware for handling 404 errors
 app.use(notFoundError);
