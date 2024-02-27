@@ -4,7 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { notFoundError } from "./middlewares/error-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
-import testRoutes from "./routes/testRouter.js";
+import Routes from "./routes/Routes.js";
 
 
 // Creating an express app

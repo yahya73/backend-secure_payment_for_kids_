@@ -9,6 +9,7 @@ import {
   } from "@hashgraph/sdk";
   import dotenv from 'dotenv';
   dotenv.config();
+  import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
   const accountIdString = process.env.ACCOUNT_ID;
 const privateKeyString = process.env.ACCOUNT_PRIVATE_KEY;
 const tokenId = process.env.TOKEN_ID
@@ -22,6 +23,7 @@ async function createchildinblockchain(){
     
     console.log('- Creating a new account...\n');
     const privateKey = PrivateKey.generateECDSA();
+      console.log("private"+privateKey);
     const publicKey = privateKey.publicKey;
     // Assuming that the target shard and realm are known.
     // For now they are virtually always 0 and 0.
@@ -64,7 +66,7 @@ async function createchildinblockchain(){
     tokenBalanceAccountId.toInt() === 10
         ? console.log(`Account is created successfully using HTS 'TransferTransaction'`)
         : console.log("Creating account with HTS using public key alias failed");
-    return accountId;
+    return { privateKey ,accountId };
 }
 
 
@@ -73,13 +75,21 @@ export  async function createChild(req, res) {
     const child = req.body;
     child.Role="child"
     try {
-      const accountId =  await  createchildinblockchain();
+      const {privateKey, accountId} =  await  createchildinblockchain();
+      
       child.Adressblockchain = accountId.toString();
         const childcreated = await User.create(child);
-        
-
-    
-        res.json(childcreated);
+        console.log(childcreated)
+      const key =  await transformString(childcreated.Username);
+       const encrypted = encryptText(privateKey,key);
+       console.log(encrypted)
+       const decrypted = decryptText(encrypted.encryptedText,encrypted.iv,key);
+        res.json({
+            key:key,
+            encrypted:encrypted.encryptedText,
+            privatekey:privateKey.toString(),
+            decrypted :decrypted
+        });
    
     } catch (error) {
         throw new Error('Error creating child user');
@@ -135,4 +145,93 @@ async function sendToken(client, tokenId, owner, aliasAccountId, sendBalance, tr
     let tokenTransferSubmit = await tokenTransferTxSign.execute(client);
     // Get transaction receipt information
     await tokenTransferSubmit.getReceipt(client);
+}
+async function transformString(input) {
+    if (input.length <= 6) {
+        return input; // If the input length is 6 or less, return the input as is
+    }
+try {
+   
+
+    let middleIndex = Math.floor(input.length / 2);
+    
+    // Find the index of the middle character
+    let transformedString = 'a'; // Initialize the transformed string
+    
+    // Add the characters according to the specified pattern
+    transformedString += input[middleIndex];
+    transformedString += 'za'
+    transformedString += input[middleIndex + 2];
+    transformedString += 'bz'
+    middleIndex = middleIndex +2;
+    transformedString += input[middleIndex - 3];
+    transformedString += 'xb'
+    middleIndex = middleIndex -3;
+    transformedString += input[middleIndex - 1];
+    transformedString += 'cx'
+    
+    transformedString += input[input.length - 1];
+    transformedString += 'uc'
+    transformedString += input[input.length - 2];
+    transformedString += input[1];
+    transformedString += 'du'
+    transformedString += input[middleIndex+1];
+    transformedString += 'qd'
+    transformedString += input[0];
+    transformedString += 'eq'
+    if (input.length >= 10) {
+
+       transformedString += input[middleIndex+2];
+    transformedString += 'le'
+    transformedString += input[middleIndex+3];
+    transformedString += 'fl' 
+    transformedString += input[middleIndex+1];// If the input length is 6 or less, return the input as is
+    }
+   
+
+    // Add characters from the alphabet in the specified pattern
+ 
+
+    return transformedString;
+} catch (error) {
+    console.log(error)
+}
+}
+function encryptText(text, key) {
+    try{
+      let  keybytes = Buffer.from(key, 'utf-8');
+      console.log(keybytes.length);
+        if (keybytes.length > 32) {
+            // Truncate the key if it's longer than 32 bytes
+           keybytes= keybytes.subarray(0, 32);
+        } else if (keybytes.length < 32) {
+            // Pad the key with null bytes if it's shorter than 32 bytes
+           keybytes =  key.padEnd(32, '\0');
+        } 
+       
+   //     const data =  Buffer.from(text);
+    const iv = randomBytes(16); // Generate a random initialization vector
+    const cipher = createCipheriv('aes-256-cbc', keybytes, iv);
+    let encryptedText = cipher.update(text.toString(), 'utf8', 'hex');
+    encryptedText += cipher.final('hex');
+    return { iv: iv.toString('hex'), encryptedText };
+    }catch(error){
+        console.log(error)
+    }
+}
+
+// Function to decrypt an encrypted string using a key and initialization vector (iv)
+function decryptText(encryptedText, iv, key) {
+  let  keybytes = Buffer.from(key, 'utf-8');
+    if (keybytes.length > 32) {
+        // Truncate the key if it's longer than 32 bytes
+      keybytes=  keybytes.subarray(0, 32);
+    } else if (keybytes.length < 32) {
+        // Pad the key with null bytes if it's shorter than 32 bytes
+       keybytes =  key.padEnd(32, '\0');
+    } 
+    const decipher = createDecipheriv('aes-256-cbc', keybytes, Buffer.from(iv, 'hex'));
+    let decryptedText = decipher.update(encryptedText, 'hex', 'utf8');
+    decryptedText += decipher.final('utf8');
+    return decryptedText;
 }
