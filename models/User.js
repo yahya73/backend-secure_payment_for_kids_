@@ -42,13 +42,18 @@ const UserSchema = new Schema({
         type: String,
        
     },
-    ProhibitedProductTypes:{
-        type: [String],
-        
-    },
+ProhibitedProductTypes:{
+    type: [String],
+
+       
+},
     Verified: {
         type: Boolean,
         required: true
+    },
+    Banned: {
+        type: Boolean, // Define Banned as a single boolean value
+        default: false // Default value is false (user is not banned by default)
     }
 
 });

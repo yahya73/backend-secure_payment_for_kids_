@@ -32,7 +32,8 @@ export const registerPartenaire = async (req, res) => {
             PhoneNumber,
             AdressBlockchain: 'static blockchain address', 
             ProhibitedProductTypes: ['type1', 'type2'],
-            Verified : false
+            Verified : false,
+            banned:false
         });
 
         console.log("aaaaaa")
