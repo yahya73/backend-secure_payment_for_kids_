@@ -9,7 +9,7 @@ const UserSchema = new Schema({
     
     Username :{
         type: String,
-        required: true
+        required: true  
     },
     Email:{
         type: String,
@@ -44,8 +44,18 @@ const UserSchema = new Schema({
     },
 ProhibitedProductTypes:{
     type: [String],
+
        
-}
+},
+    Verified: {
+        type: Boolean,
+        required: true
+    },
+    Banned: {
+        type: Boolean, // Define Banned as a single boolean value
+        default: false // Default value is false (user is not banned by default)
+    }
+
 });
 
 // Creating and exporting the 'Test' model using the defined schema
