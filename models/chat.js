@@ -15,6 +15,10 @@ const ChatSchema = new Schema({
     image:{
         type: String,
         required: false
+    },
+    room_id:{
+        type: Number,
+        required: true
     }
 
 });
