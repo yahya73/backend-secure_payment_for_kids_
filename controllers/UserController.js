@@ -2,6 +2,27 @@ import User from "../models/User.js";
 import bcrypt from 'bcrypt';
 import {validationResult} from "express-validator";
 
+import User from '../models/User.js';
+import {
+    AccountId,
+    PrivateKey,
+    Client,
+    AccountBalanceQuery,
+    AccountInfoQuery,
+    TransferTransaction,
+  } from "@hashgraph/sdk";
+  import dotenv from 'dotenv';
+  dotenv.config();
+  import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+  const accountIdString = process.env.ACCOUNT_ID;
+const privateKeyString = process.env.ACCOUNT_PRIVATE_KEY;
+const tokenId = process.env.TOKEN_ID
+if (accountIdString === undefined || privateKeyString === undefined) { throw new Error('account id and private key in env file are empty') }
+
+const operatorAccountId = AccountId.fromString(accountIdString);
+const operatorPrivateKey = PrivateKey.fromString(privateKeyString);
+
+const client = Client.forTestnet().setOperator(operatorAccountId, operatorPrivateKey);
 export async function signin(req, res) {
   const { identifier, password } = req.body;
 
@@ -112,27 +133,6 @@ export function unbanUser(req, res) {
     }
 }
 
-import User from '../models/User.js';
-import {
-    AccountId,
-    PrivateKey,
-    Client,
-    AccountBalanceQuery,
-    AccountInfoQuery,
-    TransferTransaction,
-  } from "@hashgraph/sdk";
-  import dotenv from 'dotenv';
-  dotenv.config();
-  import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
-  const accountIdString = process.env.ACCOUNT_ID;
-const privateKeyString = process.env.ACCOUNT_PRIVATE_KEY;
-const tokenId = process.env.TOKEN_ID
-if (accountIdString === undefined || privateKeyString === undefined) { throw new Error('account id and private key in env file are empty') }
-
-const operatorAccountId = AccountId.fromString(accountIdString);
-const operatorPrivateKey = PrivateKey.fromString(privateKeyString);
-
-const client = Client.forTestnet().setOperator(operatorAccountId, operatorPrivateKey);
 async function createchildinblockchain(){
     
     console.log('- Creating a new account...\n');
