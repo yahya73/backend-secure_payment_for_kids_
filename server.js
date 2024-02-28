@@ -8,7 +8,7 @@ import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js"
 import dotenv from 'dotenv';
 import user from './routes/UserRoutes.js';
-import productroutes from "./models/product.js";
+import productroutes from "./routes/product.js";
 // Creating an express app
 const app = express();
 
