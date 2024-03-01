@@ -10,10 +10,14 @@ import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js";
 import ParentRoutes from "./routes/parentRoutes.js";
 import dotenv from "dotenv";
-import user from "./routes/UserRoutes.js";
+
 import chatRoutes from "./routes/ChatRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import PaymentRoutes from "./routes/payment.js";
+
+import userRoutes from './routes/UserRoutes.js';
+import productroutes from "./routes/productroutesmootez.js";
+// Creating an express app
 const app = express();
 const server = http.createServer(app); // Create a server instance
 
@@ -58,9 +62,12 @@ app.use("/img", express.static("public/images"));
 // Importing the routes for the 'tests' resource
 app.use("/partenaire", PartenaireRoutes);
 app.use("/parent", ParentRoutes);
-app.use("/chat", chatRoutes), app.use("/", user);
+app.use("/chat", chatRoutes);
+ app.use("/", userRoutes);
 app.use('/api', Routes);
 app.use('/api', ProductRoutes);
+
+app.use('/product', productroutes)
 app.use('/api',PaymentRoutes);
 
 
