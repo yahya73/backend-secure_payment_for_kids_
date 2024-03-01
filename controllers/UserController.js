@@ -172,20 +172,7 @@ export async function createchildinblockchain(){
    *
    * Show the new account ID owns the fungible token
    */
-    const accountBalances = await new AccountBalanceQuery()
-        .setAccountId(aliasAccountId)
-        .execute(client);
-    if (!accountBalances.tokens || !accountBalances.tokens._map) {
-        throw new Error('account balance shows no tokens.');
-    }
-    const tokenBalanceAccountId = accountBalances.tokens._map
-        .get(tokenId.toString());
-    if (!tokenBalanceAccountId) {
-        throw new Error(`account balance does not have tokens for token id: ${tokenId}.`);
-    }
-    tokenBalanceAccountId.toInt() === 10
-        ? console.log(`Account is created successfully using HTS 'TransferTransaction'`)
-        : console.log("Creating account with HTS using public key alias failed");
+  
     return { privateKey ,accountId };
 }
 
@@ -198,22 +185,23 @@ export  async function createChild(req, res) {
       const {privateKey, accountId} =  await  createchildinblockchain();
       
       child.Adressblockchain = accountId.toString();
+      
         const childcreated = await User.create(child);
         
       const key =  await transformString(childcreated.Username);
-       const {iv,encrypted} = encryptText(privateKey,key);
-    
-       const decrypted = decryptText(encrypted.encryptedText,encrypted.iv,key);
+       const encrypted = encryptText(privateKey,key);
+       
+       const decrypted =  decryptText(encrypted.encryptedText,encrypted.iv,key);
         res.json({
             key:key,
             encrypted:encrypted.encryptedText,
             privatekey:privateKey.toString(),
             decrypted :decrypted,
-            iv:iv
+            iv:encrypted.iv
         });
    
     } catch (error) {
-        throw new Error('Error creating child user');
+        throw new Error('Error creating child user'+ error);
     }
 }
 
@@ -335,10 +323,12 @@ export function encryptText(text, key) {
     const cipher = createCipheriv('aes-256-cbc', keybytes, iv);
     let encryptedText = cipher.update(text.toString(), 'utf8', 'hex');
     encryptedText += cipher.final('hex');
-    return { iv: iv.toString('hex'), encryptedText };
+    
+    return { iv: iv.toString('hex'), encryptedText:encryptedText };
     }catch(error){
-        console.log(error)
+        console.log("ppppp"+error)
     }
+    
 }
 
 // Function to decrypt an encrypted string using a key and initialization vector (iv)

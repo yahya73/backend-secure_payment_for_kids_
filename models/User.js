@@ -49,7 +49,7 @@ ProhibitedProductTypes:{
 },
     Verified: {
         type: Boolean,
-        required: true
+        
     },
     Banned: {
         type: Boolean, // Define Banned as a single boolean value
