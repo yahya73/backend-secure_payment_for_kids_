@@ -14,7 +14,7 @@ import NotificationRoutes from "./routes/NotificationRoutes.js";
 import chatRoutes from "./routes/ChatRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import PaymentRoutes from "./routes/payment.js";
-
+import WishlistRoutes from "./routes/wishlistRoutes.js";
 import userRoutes from './routes/UserRoutes.js';
 import productroutes from "./routes/productroutesmootez.js";
 // Creating an express app
@@ -60,6 +60,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serving static files (images) from the 'public/images' directory
 app.use("/img", express.static("public/images"));
 
+app.use('/WishList', WishlistRoutes);
 // Importing the routes for the 'tests' resource
 app.use("/partenaire", PartenaireRoutes);
 app.use("/parent", ParentRoutes);
