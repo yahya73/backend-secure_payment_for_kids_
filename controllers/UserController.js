@@ -35,8 +35,8 @@ export async function signin(req, res) {
     // Determine if the identifier is an email or a username
     let user = await User.findOne({
       $or: [
-        { "Email": identifier },
-        { "Username": identifier }
+        { "email": identifier },
+        { "username": identifier }
       ]
     });
 

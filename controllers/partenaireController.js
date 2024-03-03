@@ -6,30 +6,30 @@ import { google } from 'googleapis';
 
 export const registerPartenaire = async (req, res) => {
     try {
-        const { Username, Email, Password, PhoneNumber } = req.body;
+        const { username, email, password, phoneNumber } = req.body;
 
         // Vérifier si le partenaire existe déjà
-        const existingPartenaire = await UserModel.findOne({ Username });
+        const existingPartenaire = await UserModel.findOne({ username });
 
         if (existingPartenaire) {
             return res.status(400).json({ message: "Partenaire already exists", partenaire: existingPartenaire });
         }        
 
-        const existingEmail = await UserModel.findOne({ Email });
+        const existingEmail = await UserModel.findOne({ email });
 
         if (existingEmail) {
             return res.status(400).json({ message: "User with this email already exists" });
         }  
 
-        const hashedPassword = await bcrypt.hash(Password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newPartenaire = new UserModel({
-           Username,
-            Email,
+           username,
+            email,
             password: hashedPassword,
             role: 'partner',
             image: 'default image', 
-            PhoneNumber,
+            phoneNumber,
             adressBlockchain: 'static blockchain address', 
             prohibitedProductTypes: ['type1', 'type2'],
             verified : false,

@@ -11,33 +11,33 @@ import {
   } from '@ethersproject/hdnode';
 export const registerParent = async (req, res) => {
     try {
-        const { Username, Email, Password, PhoneNumber } = req.body;
+        const { username, email, password, phoneNumber } = req.body;
 
        // const { accountId, mnemonic, balance} = await createHederaAccount();
       
         // Vérifier si le partenaire existe déjà
-        const existingParent = await UserModel.findOne({ Username });
+        const existingParent = await UserModel.findOne({ username });
 
         if (existingParent) {
             return res.status(400).json({ message: "User already exists", parent: existingParent });
         }        
 
-        const existingEmail = await UserModel.findOne({ Email });
+        const existingEmail = await UserModel.findOne({ email });
 
         if (existingEmail) {
             return res.status(400).json({ message: "User with this email already exists" });
         }  
 
-        const hashedPassword = await bcrypt.hash(Password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         const {privateKey, accountId} =  await  createchildinblockchain();
         
         const newParent = new UserModel({
-            Username,
-            Email,
+            username,
+            email,
             password: hashedPassword,
             role: 'parent',
             image: 'default image', 
-            PhoneNumber,
+            phoneNumber,
             adressblockchain: accountId, 
             prohibitedProductTypes: ['type1', 'type2'],
             verified : false,
