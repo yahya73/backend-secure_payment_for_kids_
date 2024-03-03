@@ -34,18 +34,18 @@ export const registerParent = async (req, res) => {
         const newParent = new UserModel({
             Username,
             Email,
-            Password: hashedPassword,
-            Role: 'parent',
+            password: hashedPassword,
+            role: 'parent',
             image: 'default image', 
             PhoneNumber,
-            Adressblockchain: accountId, 
-            ProhibitedProductTypes: ['type1', 'type2'],
-            Verified : false,
+            adressblockchain: accountId, 
+            prohibitedProductTypes: ['type1', 'type2'],
+            verified : false,
         });
 
         const parent = await newParent.save();
        
-        const key =  await transformString(newParent.Username);
+        const key =  await transformString(newParent.username);
         const encrypted = encryptText(privateKey,key);
 
       
@@ -194,9 +194,9 @@ export const verifyEmail = async (req, res) => {
         
         // Find the user by email and update the Verified field to true
         const user = await UserModel.findOneAndUpdate(
-            { Email: email }, 
-            { Verified: true }, 
-            { new: true, projection: { Username: 1, Email: 1, Role: 1, Verified: 1 } }
+            { email: email }, 
+            { verified: true }, 
+            { new: true, projection: { username: 1, email: 1, role: 1, verified: 1 } }
         );
 
         if (!user) {

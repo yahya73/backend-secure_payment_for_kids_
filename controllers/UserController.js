@@ -46,7 +46,7 @@ export async function signin(req, res) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.Password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: "Invalid password" });
     }
@@ -84,7 +84,7 @@ export function banUser(req, res) {
         user.findByIdAndUpdate(
             req.params.id,
             {
-                Banned:req.body.banned,
+                banned:req.body.banned,
             },
             { new: true } // Return the updated user
         )
@@ -111,10 +111,10 @@ export function unbanUser(req, res) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
         // If there are no validation errors, update the user by ID
-        user.findByIdAndUpdate(
+        User.findByIdAndUpdate(
             req.params.id,
             {
-                Banned:false,
+                banned:false,
             },
             { new: true } // Return the updated user
         )
@@ -180,7 +180,7 @@ export async function createchildinblockchain(){
 // Function to create a new child user
 export  async function createChild(req, res) {
     const child = req.body;
-    child.Role="child"
+    child.role="child"
     try {
       const {privateKey, accountId} =  await  createchildinblockchain();
       
@@ -188,7 +188,7 @@ export  async function createChild(req, res) {
       
         const childcreated = await User.create(child);
         
-      const key =  await transformString(childcreated.Username);
+      const key =  await transformString(childcreated.username);
        const encrypted = encryptText(privateKey,key);
        
        const decrypted =  decryptText(encrypted.encryptedText,encrypted.iv,key);
@@ -208,7 +208,7 @@ export  async function createChild(req, res) {
 // Function to get all children by parent ID
 export  async function getAllChildrenByParentId(req, res) {
     try {
-        const children = await User.find({ Parentid: req.params.parentid, Role: 'child' });
+        const children = await User.find({ Parentid: req.params.parentid, role: 'child' });
       
         res.json(children)
     } catch (error) {
@@ -219,7 +219,7 @@ export  async function getAllChildrenByParentId(req, res) {
 // Function to get all children
 export async function getAllChildren(req, res) {
     try {
-        const children = await User.find({ Role: 'child' });
+        const children = await User.find({ role: 'child' });
         res.json(children)
     } catch (error) {
         throw new Error('Error fetching children');
@@ -360,7 +360,7 @@ const sendPasswordResetEmail = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (user.Verified === false) {
+    if (user.verified === false) {
       return res.status(401).json({ error: "User not verified" });
     }
 
@@ -420,7 +420,7 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update the user's password in the database
-    user.Password = hashedPassword;
+    user.password = hashedPassword;
     await user.save();
 
     return res.status(200).json({ message: 'Password reset successfully' });

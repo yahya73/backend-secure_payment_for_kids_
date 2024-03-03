@@ -7,19 +7,19 @@ const { Schema, model } = mongoose;
 const UserSchema = new Schema({
     // Defining a field 'name' of type String, which is required
     
-    Username :{
+    username :{
         type: String,
         required: true  
     },
-    Email:{
+    email:{
         type: String,
         
     },
-    Password:{
+    password:{
         type: String,
         required: true
     },
-    Role:{
+    role:{
         type: String,
         required: true,
         enum:['admin','parent','partner','child'],
@@ -30,28 +30,28 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    Parentid:{
+    parentid:{
         type: String,
         
     },
-    PhoneNumber:{
+    phoneNumber:{
         type: Number,
         required: true
     },
-    Adressblockchain:{
+    adressblockchain:{
         type: String,
        
     },
-ProhibitedProductTypes:{
+prohibitedProductTypes:{
     type: [String],
 
        
 },
-    Verified: {
+    verified: {
         type: Boolean,
         
     },
-    Banned: {
+    banned: {
         type: Boolean, // Define Banned as a single boolean value
         default: false // Default value is false (user is not banned by default)
     }

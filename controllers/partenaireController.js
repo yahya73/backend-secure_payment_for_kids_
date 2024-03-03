@@ -24,15 +24,15 @@ export const registerPartenaire = async (req, res) => {
         const hashedPassword = await bcrypt.hash(Password, 10);
 
         const newPartenaire = new UserModel({
-            Username,
+           Username,
             Email,
-            Password: hashedPassword,
-            Role: 'partner',
+            password: hashedPassword,
+            role: 'partner',
             image: 'default image', 
             PhoneNumber,
-            AdressBlockchain: 'static blockchain address', 
-            ProhibitedProductTypes: ['type1', 'type2'],
-            Verified : false,
+            adressBlockchain: 'static blockchain address', 
+            prohibitedProductTypes: ['type1', 'type2'],
+            verified : false,
             banned:false
         });
 
@@ -103,9 +103,9 @@ export const verifyEmail = async (req, res) => {
         
         // Find the user by email and update the Verified field to true
         const user = await UserModel.findOneAndUpdate(
-            { Email: email }, 
-            { Verified: true }, 
-            { new: true, projection: { Username: 1, Email: 1, Role: 1, Verified: 1 } }
+            { email: email }, 
+            { verified: true }, 
+            { new: true, projection: { username: 1, email: 1, role: 1, verified: 1 } }
         );
 
         if (!user) {

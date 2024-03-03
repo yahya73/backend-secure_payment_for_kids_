@@ -10,7 +10,7 @@ import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js";
 import ParentRoutes from "./routes/parentRoutes.js";
 import dotenv from "dotenv";
-
+import NotificationRoutes from "./routes/NotificationRoutes.js";
 import chatRoutes from "./routes/ChatRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import PaymentRoutes from "./routes/payment.js";
@@ -37,6 +37,7 @@ mongoose
   .connect(
     `mongodb+srv://localhost:GWaB8yrPjyl265Vw@paymentforkids.vliqoot.mongodb.net/${databaseName}`
   )
+  //.connect('mongodb://localhost:27017/kidscoin')
   .then(() => {
     console.log(`Connected to  db`);
   })
@@ -66,7 +67,7 @@ app.use("/chat", chatRoutes);
  app.use("/", userRoutes);
 app.use('/api', Routes);
 app.use('/api', ProductRoutes);
-
+app.use('/api', NotificationRoutes);
 app.use('/product', productroutes)
 app.use('/api',PaymentRoutes);
 
