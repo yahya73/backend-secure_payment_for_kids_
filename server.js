@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { Server } from "socket.io"; // Import socket.io
 import http from "http"; // Import http module
+ // Import http module
 import { notFoundError } from "./middlewares/error-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import Routes from "./routes/Routes.js";
@@ -20,13 +21,16 @@ import productroutes from "./routes/productroutesmootez.js";
 // Creating an express app
 const app = express();
 const server = http.createServer(app); // Create a server instance
+ // Create a server instance
 
 dotenv.config();
 // Setting the port number for the server (default to 9090 if not provided)
 const PORT = 9090 || process.env.PORT;
 const databaseName = "PIM";
 
+
 // Enabling debug mode for mongoose
+mongoose.set("debug", true);
 mongoose.set("debug", true);
 
 // Setting the global Promise library
@@ -49,6 +53,7 @@ mongoose
 app.use(cors());
 
 // Using morgan for logging HTTP requests
+app.use(morgan("dev"));
 app.use(morgan("dev"));
 
 // Parsing JSON request bodies

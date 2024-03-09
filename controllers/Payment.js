@@ -7,7 +7,7 @@ export async function payment(req, res) {
         "app_secret": process.env.FLOUCT_SECRET,
         "accept_card":"true",
         "amount":req.body.amount,
-        "success_link": "https://example.website.com/success",
+        "success_link": `http://127.0.0.1:9090/api/payment/success/${req.body.amount}`,
         "fail_link": "https://example.website.com/fail",
         "session_timeout_secs": 1200,
         "developer_tracking_id": "814ff20b-114b-4ff3-bd25-0f968e6ef2fc"
@@ -21,6 +21,18 @@ export async function payment(req, res) {
         res.status(500).send("An error occurred while processing payment.");
     }
 }
+export async function success(req, res) {
+    console.log("iheebb");
+    // Extracting 'amount' parameter from request URL
+    const amount = req.params.amount;
+
+    // Logging the value of 'amount' to the console
+    console.log(amount);
+
+    // Sending a response back to the client
+    res.status(200).send('Success'); // Sending a simple success message
+}
+
 export async function verifyPayment(req, res) {
     const paymentId = req.params.id;
     try {

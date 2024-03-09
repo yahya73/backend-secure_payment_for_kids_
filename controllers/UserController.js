@@ -50,7 +50,7 @@ export async function signin(req, res) {
     if (!isValidPassword) {
       return res.status(401).json({ error: "Invalid password" });
     }
-
+console.log(user)
     res.status(200).json(user);
   } catch (error) {
     console.error('Error:', error);
@@ -59,11 +59,77 @@ export async function signin(req, res) {
 }
 
 
+export function updateOnce(req, res) {
+  // Check if there are validation errors
+  if (!validationResult(req).isEmpty()) {
+      // Respond with 400 Bad Request and the validation errors
+      return res.status(400).json({ errors: validationResult(req).array() });
+  } else {
+      // If there are no validation errors, update the user by Username
+      User.findOneAndUpdate(
+          { username: req.body.Username }, // Query based on the unique Username
+          {
+              // Updating 'PhoneNumber', 'image', and 'Email' with the values from the request body
+              phoneNumber: req.body.PhoneNumber,
+              image: req.body.image,
+              email: req.body.Email,
+          },
+          { new: true } // Return the updated user
+      )
+          .then((updatedUser) => {
+              // Check if the user exists
+              if (!updatedUser) {
+                  return res.status(404).json({ message: 'User not found' });
+              }
+              // Respond with the updated user details
+              res.json(updatedUser);
+          })
+          .catch((err) => {
+              // Respond with 500 Internal Server Error and the error details
+              res.status(500).json({ error: err });
+          });
+  }
+}
+
+  export function updateUser(req, res) {
+      // Check if there are validation errors
+      if (!validationResult(req).isEmpty()) {
+          // Respond with 400 Bad Request and the validation errors
+          return res.status(400).json({ errors: validationResult(req).array() });
+      } else {
+          // If there are no validation errors, update the user by Username
+      User.findByIdAndUpdate(
+          req.params.id,
+              {
+                  // Query based on the unique Username
+                  // Updating 'PhoneNumber', 'image', and 'Email' with the values from the request body
+                  PhoneNumber: req.body.PhoneNumber,
+                  Email: req.body.Email,
+                  Role: req.body.Role,
+              },
+              { new: true } // Return the updated user
+          )
+              .then((updatedUser) => {
+                  // Check if the user exists
+                  if (!updatedUser) {
+                      return res.status(404).json({ message: 'User not found' });
+                  }
+                  // Respond with the updated user details
+                  res.json(updatedUser);
+              })
+              .catch((err) => {
+                  // Respond with 500 Internal Server Error and the error details
+                  res.status(500).json({ error: err });
+              });
+      }
+  }
 
 
-export function getAll(req, res) {
+
+
+    export function getAll(req, res) {
     // Retrieve all tests from the database
-    user.find()
+    User.find()
         .then((users) => {
             // Respond with the array of tests
             res.json(users);
@@ -81,7 +147,7 @@ export function banUser(req, res) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
         // If there are no validation errors, update the user by ID
-        user.findByIdAndUpdate(
+        User.findByIdAndUpdate(
             req.params.id,
             {
                 banned:req.body.banned,

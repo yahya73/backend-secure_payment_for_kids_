@@ -38,8 +38,15 @@ export const registerPartenaire = async (req, res) => {
 
         console.log("aaaaaa")
 
+        console.log("aaaaaa")
+
         const partenaire = await newPartenaire.save();
 
+        // const token = jwt.sign(
+        //     { username: partenaire.Username, id: partenaire._id },
+        //     process.env.JWT_KEY,
+        //     { expiresIn: "1h" }
+        // );        
         // const token = jwt.sign(
         //     { username: partenaire.Username, id: partenaire._id },
         //     process.env.JWT_KEY,
@@ -48,7 +55,9 @@ export const registerPartenaire = async (req, res) => {
 
         // Send verification email
         // await sendVerificationEmail(Email, Username);
+        // await sendVerificationEmail(Email, Username);
 
+        res.status(200).json({ partenaire });
         res.status(200).json({ partenaire });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -79,7 +88,33 @@ const sendVerificationEmail = async (email, username) => {
                 accessToken: ACCESS_TOKEN,
             },
         });
+    try {
 
+        const oAuth2Client = new google.auth.OAuth2(
+            process.env.CLIENT_ID,
+            process.env.CLIENT_SECRET,
+            "https://developers.google.com/oauthplayground"
+          );
+        oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+
+        const ACCESS_TOKEN = await oAuth2Client.getAccessToken();
+        console.log("Access token:", ACCESS_TOKEN);
+
+        // Create nodemailer transporter with OAuth2 authentication
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                type: "OAuth2",
+                user: process.env.EMAIL_USER,
+                clientId: process.env.CLIENT_ID,
+                clientSecret: process.env.CLIENT_SECRET,
+                refreshToken: process.env.REFRESH_TOKEN,
+                accessToken: ACCESS_TOKEN,
+            },
+        });
+
+        // Define email options
+       
         // Define email options
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -88,6 +123,13 @@ const sendVerificationEmail = async (email, username) => {
             html: `Hey ${username}, click <a href="http://localhost:9090/partenaire/verifyEmail/${email}">here</a> to verify your email.`,
         };
 
+        // Send the email
+        await transporter.sendMail(mailOptions);
+        console.log("Verification email sent successfully.");
+    } catch (error) {
+        console.error("Error sending verification email:", error);
+        throw new Error("Error sending verification email.");
+    }
         // Send the email
         await transporter.sendMail(mailOptions);
         console.log("Verification email sent successfully.");
