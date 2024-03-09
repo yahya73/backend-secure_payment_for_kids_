@@ -185,7 +185,8 @@ export  async function createChild(req, res) {
       const {privateKey, accountId} =  await  createchildinblockchain();
       
       child.Adressblockchain = accountId.toString();
-      
+      const hashedPassword = await bcrypt.hash(child.password, 10);
+      child.password = hashedPassword;
         const childcreated = await User.create(child);
         
       const key =  await transformString(childcreated.username);
@@ -208,7 +209,7 @@ export  async function createChild(req, res) {
 // Function to get all children by parent ID
 export  async function getAllChildrenByParentId(req, res) {
     try {
-        const children = await User.find({ Parentid: req.params.parentid, role: 'child' });
+        const children = await User.find({ parentid: req.params.parentid, role: 'child' });
       
         res.json(children)
     } catch (error) {

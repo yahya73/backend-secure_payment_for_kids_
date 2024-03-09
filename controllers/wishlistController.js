@@ -5,7 +5,9 @@ import WishList from "../models/wishlist.js";
 const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find();
+        console.log('fcffh'+products);
         res.status(200).json(products);
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -15,6 +17,7 @@ const getAllProductswhished = async (req, res) => {
     const { childId } = req.params;
     try {
         const products = await Product.find({ childId });
+      
         res.status(200).json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -37,8 +40,9 @@ const getAllProductsdetails = async (req, res) => {
 
             // Add the product details to the detailedProducts array
             detailedProducts.push(productDetails);
-        }
 
+        }
+               
         res.status(200).json(detailedProducts);
     } catch (error) {
         res.status(500).json({ message: error.message });
