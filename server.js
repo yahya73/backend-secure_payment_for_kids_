@@ -18,6 +18,9 @@ import PaymentRoutes from "./routes/payment.js";
 import WishlistRoutes from "./routes/wishlistRoutes.js";
 import userRoutes from './routes/UserRoutes.js';
 import productroutes from "./routes/productroutesmootez.js";
+import TaskRoutes from './routes/taskRoutes.js';
+
+
 // Creating an express app
 const app = express();
 const server = http.createServer(app); // Create a server instance
@@ -76,6 +79,7 @@ app.use('/api', ProductRoutes);
 app.use('/api', NotificationRoutes);
 app.use('/product', productroutes)
 app.use('/api',PaymentRoutes);
+app.use('/task', TaskRoutes);
 
 
 // Using custom middleware for handling 404 errors
