@@ -1,6 +1,7 @@
 import UserModel from "../models/User.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { AccountId, AccountRecordsQuery } from "@hashgraph/sdk";
 import nodemailer from 'nodemailer'; // Import nodemailer for sending emails
 import { google } from 'googleapis';
 import { Client, PrivateKey, AccountCreateTransaction, AccountBalanceQuery, Hbar, Mnemonic } from "@hashgraph/sdk";
@@ -210,3 +211,37 @@ export const verifyEmail = async (req, res) => {
         res.status(500).json({ message: 'Error verifying email' });
     }
 };
+
+
+//get child's transactions 
+export async function getChildTransactionHistory(req, res) {
+    const parentId = req.params.parentId; // Assuming the parent's ID is passed as a URL parameter
+
+    try {
+        // Find the child user by parentId
+        const child = await User.findOne({ parentid: parentId, role: 'child' });
+
+        if (!child) {
+            return res.status(404).json({ error: "Child not found" });
+        }
+
+        const accountId = child.Adressblockchain; // Assuming this is where the Hedera account ID is stored
+        const recordsQuery = new AccountRecordsQuery()
+            .setAccountId(AccountId.fromString(accountId));
+
+        const records = await recordsQuery.execute(client);
+        const transactions = records.map(record => ({
+            transactionId: record.transactionId.toString(),
+            status: record.receipt.status.toString(),
+            timestamp: record.consensusTimestamp.toString(),
+            memo: record.transactionMemo,
+        }));
+
+        res.json({ accountId: accountId, transactions: transactions });
+    } catch (error) {
+        console.error("Error retrieving child transaction history:", error);
+        res.status(500).json({ error: error.toString() });
+    }
+}
+
+
