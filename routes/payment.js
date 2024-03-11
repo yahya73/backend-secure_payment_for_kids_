@@ -6,6 +6,6 @@ router.route("/payment")
 .post(payment)
 router.route("/verifyPayment/:paymentId")
     .post(verifyPayment)
-router.route("/payment/success/:amount")
+router.route("/payment/success/:amount/:userid")
     .get(success)
 export default router;
