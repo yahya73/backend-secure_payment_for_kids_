@@ -9,6 +9,8 @@ import { errorHandler } from "./middlewares/error-handler.js";
 import Routes from "./routes/Routes.js";
 import PartenaireRoutes from "./routes/partenaireRoutes.js";
 import ParentRoutes from "./routes/parentRoutes.js";
+import reelRoutes from "./routes/reelRoutes.js";
+
 import dotenv from "dotenv";
 import user from "./routes/UserRoutes.js";
 import chatRoutes from "./routes/ChatRoutes.js";
@@ -62,6 +64,7 @@ app.use("/chat", chatRoutes), app.use("/", user);
 app.use('/api', Routes);
 app.use('/api', ProductRoutes);
 app.use('/api',PaymentRoutes);
+app.use('/api', reelRoutes);
 
 
 // Using custom middleware for handling 404 errors
