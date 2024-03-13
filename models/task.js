@@ -6,7 +6,7 @@ const TaskSchema = new Schema({
     
     //child username
     childUsername:{
-        type: Number,
+        type: String,
         required: true
     },
     //parent username
@@ -59,7 +59,14 @@ const TaskSchema = new Schema({
         type: String,
         required: false
     },
-    
+    score:{
+        type: Boolean,
+        required: false
+    },
+    imageAnswer:{
+        type: String,
+        required : false
+    },
 
 
 });
