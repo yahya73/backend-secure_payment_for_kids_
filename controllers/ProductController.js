@@ -1,5 +1,10 @@
 import { validationResult } from 'express-validator';
 import Product from "../models/product.js";
+import admin from 'firebase-admin';
+admin.initializeApp({
+    credential: admin.credential.cert('./firebase-admin-config.json'), // Provide the path to your service account key JSON file
+  });
+  const db = admin.firestore();
 
 // Controller function to create a new product
 // Controller function to create a new product
@@ -32,6 +37,7 @@ export function addOnce(req, res) {
                 });
             })
             .catch((err) => {
+                console.log(err)
                 // Respond with 500 Internal Server Error and the error details
                 res.status(500).json({ error: err });
             });
@@ -70,23 +76,43 @@ export function getOneById(req, res) {
         });
 }
 // Controller function to delete a product by ID
-export function deleteProduct(req, res) {
-    // Find the product by ID and delete it from the database
-    Product.findByIdAndDelete(req.params.id)
-        .then((deletedProduct) => {
-            // Check if the product exists
-            if (!deletedProduct) {
-                return res.status(404).json({ message: 'Product not found' });
-            }
-            // Respond with 200 OK and a success message
-            res.status(200).json({ message: 'Product deleted successfully' });
-        })
-        .catch((err) => {
-            // Respond with 500 Internal Server Error and the error details
-            res.status(500).json({ error: err });
-        });
-}
+export async function deleteProduct(req, res) {
+    try {
+        // Find the product by ID and delete it from the database
+        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
 
+        // Check if the product exists
+        if (!deletedProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Prepare notification message
+        const message = {
+            notification: {
+                title: 'Product Deleted',
+                body: `The product ${deletedProduct.name} has been deleted`,
+            },
+            topic: 'product-deleted', // Example topic name
+        };
+
+        // Send the notification
+        await admin.messaging().send(message);
+
+        // Store notification data in Cloud Firestore
+        await db.collection('notifications').add({
+            title: message.notification.title,
+            body: message.notification.body,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        // Respond with 200 OK and a success message
+        res.status(200).json({ message: 'Product deleted successfully' });
+    } catch (err) {
+        console.log(err)
+        // Respond with 500 Internal Server Error and the error details
+        res.status(500).json({ error: err.message });
+    }
+}
 // Create a new product
 const addProduct = async (req, res) => {
     try {
