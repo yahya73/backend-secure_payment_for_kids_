@@ -1,6 +1,6 @@
 import axios from "axios";
 import User from "../models/User.js";
-import {sendToken} from '../controllers/UserController.js';
+import {sendToken,decryptText,transformString, encryptText} from '../controllers/UserController.js';
 import dotenv from 'dotenv';
 import {
     AccountId,
@@ -69,7 +69,40 @@ export async function success(req, res) {
     // Sending a response back to the client
     // Sending a simple success message
 }
-
+export async function transfertochild(req, res) {
+    
+    // Extracting 'amount' parameter from request URL
+    const amount = req.body.amount;
+ const parentid = req.body.parentid;
+ const childusername = req.body.childusername;
+ const cryptedkey = req.body.cryptedkey;
+ const iv = req.body.iv;
+    // Logging the value of 'amount' to the console
+    console.log(cryptedkey);
+    console.log(iv);
+     const parent = await User.findById(parentid);
+     const key =  await transformString(parent.username);
+     console.log(key);
+     const decrypted =  decryptText(cryptedkey,iv,key);
+     const prvkey = PrivateKey.fromString(decrypted);
+    await User.findOne( { username : childusername}).then( async (user) => {
+        console.log(user.adressblockchain)
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Respond with the updated user details
+        await sendToken(client, tokenId, parent.adressblockchain, user.adressblockchain, amount, prvkey);
+      // return res.status(200).send('Success');
+    })
+    .catch((err) => {
+        // Respond with 500 Internal Server Error and the error details
+       return res.status(500).json({ error: err });
+    });
+    return res.status(202);
+    // Sending a response back to the client
+    // Sending a simple success message
+}
 export async function verifyPayment(req, res) {
     const paymentId = req.params.id;
     try {

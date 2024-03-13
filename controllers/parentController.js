@@ -31,7 +31,7 @@ export const registerParent = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const {privateKey, accountId} =  await  createchildinblockchain();
-        
+        console.log("its private"+privateKey);
         const newParent = new UserModel({
             username,
             email,

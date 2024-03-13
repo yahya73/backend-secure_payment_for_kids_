@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import multer from '../middlewares/multer-config.js';
-import {banUser,updateOnce,updateUser, getAll, unbanUser} from '../controllers/UserController.js';
+import {banUser,updateOnce,updateUser, getAll, unbanUser, getusersolde} from '../controllers/UserController.js';
 
 
 
@@ -17,6 +17,8 @@ router.route('/users')
     
 
 .put(updateOnce)
+router.route('/user/solde/:username')
+.get(getusersolde)
 router.route('/users/:id')
     .put(updateUser)
 router.route('/users/ban/:id')
