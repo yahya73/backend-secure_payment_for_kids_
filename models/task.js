@@ -6,7 +6,7 @@ const TaskSchema = new Schema({
     
     //child username
     childUsername:{
-        type: Number,
+        type: String,
         required: true
     },
     //parent username
@@ -17,7 +17,7 @@ const TaskSchema = new Schema({
     //task title
     title:{
         type: String,
-        required: false
+        required: true
     },
     //task description
     description:{
@@ -27,12 +27,12 @@ const TaskSchema = new Schema({
     //amount of coins that will be transfered once the task is completed
     amount:{
         type: Number,
-        required: false
+        required: true
     },
     //deadline 
     deadline:{
         type: Date,
-        required: false
+        required: true
     },
     //task completed or not 
     status:{
@@ -42,7 +42,7 @@ const TaskSchema = new Schema({
     //type picture or question or qcm or none(no validation needed)
     validationType:{
         type: String,
-        required: false
+        required: true
     },
     // if the validationType = qcm
     qcmQuestion:{
@@ -59,8 +59,6 @@ const TaskSchema = new Schema({
         type: String,
         required: false
     },
-    
-
 
 });
 
