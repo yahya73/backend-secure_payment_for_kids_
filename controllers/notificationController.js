@@ -15,19 +15,21 @@ import Notification from '../models/notification.js';
   }
 
   // Get notifications for a user
-  export async function getNotifications(req, res) {
-    const userId = req.params.id;
-    console.log("eooo");
-    try {
-      console.log("eooo");
-      const notifications = await Notification.find({ recipientId: userId }).sort({ createdAt: -1 });
-      res.status(200).json(notifications);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-     
-      res.status(500).json({ error: error.message });
-    }
+ export async function getNotifications(req, res) {
+  const userId = req.params.id;
+  const fcmToken = req.query.fcmToken;
+  req.session.fcmToken = fcmToken; // Retrieve FCM token from query parameters
+
+  try {
+    const notifications = await Notification.find({ recipientId: userId }).sort({ createdAt: -1 });
+    // Store FCM token in session
+    console.log(req.session.fcmToken);
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: error.message });
   }
+}
 
   
   export async function markNotificationAsRead(req, res) {

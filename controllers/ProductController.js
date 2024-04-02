@@ -5,6 +5,28 @@ admin.initializeApp({
     credential: admin.credential.cert('./firebase-admin-config.json'), // Provide the path to your service account key JSON file
   });
   const db = admin.firestore();
+  async function sendNotification(message, token) {
+    try {
+        // Send the notification
+        await admin.messaging().send({
+            notification: {
+                title: message.title,
+                body: message.body,
+            },
+            token: token,
+        });
+
+        // Store notification data in Cloud Firestore
+        await db.collection('notifications').add({
+            title: message.title,
+            body: message.body,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        });
+    } catch (err) {
+        console.log(err);
+        throw new Error('Failed to send notification');
+    }
+}
 
 // Controller function to create a new product
 // Controller function to create a new product
@@ -76,6 +98,8 @@ export function getOneById(req, res) {
         });
 }
 // Controller function to delete a product by ID
+
+
 export async function deleteProduct(req, res) {
     try {
         // Find the product by ID and delete it from the database
@@ -88,31 +112,24 @@ export async function deleteProduct(req, res) {
 
         // Prepare notification message
         const message = {
-            notification: {
-                title: 'Product Deleted',
-                body: `The product ${deletedProduct.name} has been deleted`,
-            },
-            topic: 'product-deleted', // Example topic name
+            title: 'Product Deleted',
+            body: `The product ${deletedProduct.productName} has been deleted`,
         };
 
-        // Send the notification
-        await admin.messaging().send(message);
-
-        // Store notification data in Cloud Firestore
-        await db.collection('notifications').add({
-            title: message.notification.title,
-            body: message.notification.body,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        // Token for the device to send notification
+        const token = 'eJ4RjaRtSIK7UI-EjuTtq7:APA91bFuKfbMooXj6N-2hvxjI0RoPIdcAN65wo01trY9tnkSJ61i2BvIYvbVwEYGHrzErXAu3QV0IKhn_lvKR8bM8Iz9LdIG7HmGOvDp19gK5me-B2MnQGDgMrOjOoF_wA0BTnreGOKQ';
+        console.log(token);
+        await sendNotification(message, token);
 
         // Respond with 200 OK and a success message
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         // Respond with 500 Internal Server Error and the error details
         res.status(500).json({ error: err.message });
     }
 }
+
 // Create a new product
 const addProduct = async (req, res) => {
     try {

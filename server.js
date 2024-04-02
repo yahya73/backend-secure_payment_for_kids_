@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
@@ -20,6 +21,11 @@ import userRoutes from './routes/UserRoutes.js';
 import productroutes from "./routes/productroutesmootez.js";
 // Creating an express app
 const app = express();
+app.use(session({
+  secret: 'e0a37e5d5295b90702a8ff5a2e27c47dcd51d05a11cfc69590dcb5d5904a64f',
+  resave: false,
+  saveUninitialized: true
+}));
 const server = http.createServer(app); // Create a server instance
  // Create a server instance
 
