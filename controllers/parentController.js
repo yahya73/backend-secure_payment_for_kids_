@@ -6,6 +6,10 @@ import { google } from 'googleapis';
 import { Client, PrivateKey, AccountCreateTransaction, AccountBalanceQuery, Hbar, Mnemonic } from "@hashgraph/sdk";
 import { sendVerificationEmail } from './EmailVerificationController.js'
 import { decryptText,encryptText,createchildinblockchain,transformString } from "./UserController.js";
+import Wallet from 'ethereumjs-wallet';
+import bip39 from 'bip39';
+import hdkey from 'hdkey';
+
 import {
     HDNode as ethersHdNode,
   } from '@ethersproject/hdnode';
@@ -208,5 +212,99 @@ export const verifyEmail = async (req, res) => {
     } catch (error) {
         console.error('Error verifying email:', error);
         res.status(500).json({ message: 'Error verifying email' });
+    }
+};
+
+// Route to change secret phrase
+export const changeSecretPhrase = async (req, res) => {
+    try {
+        const { username, newSecretPhrase } = req.body;
+
+        // Update the user's secret phrase in the database
+        const user = await UserModel.findOneAndUpdate(
+            { username: username },
+            { secretPhrase: newSecretPhrase },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Respond with success message
+        res.status(200).json({ message: 'Secret phrase changed successfully' });
+    } catch (error) {
+        console.error('Error changing secret phrase:', error);
+        res.status(500).json({ message: 'Error changing secret phrase' });
+    }
+};
+
+// Route to set a new secret phrase
+export const setNewSecretPhrase = async (req, res) => {
+    try {
+        const { username, newSecretPhrase } = req.body;
+
+        // Check if the user already exists
+        const existingUser = await UserModel.findOne({ username });
+
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        // Create a new user with the provided secret phrase
+        const hashedPassword = await bcrypt.hash(newSecretPhrase, 10);
+        const newUser = new UserModel({
+            username,
+            secretPhrase: hashedPassword,
+            // Add other user properties as needed
+        });
+
+        // Save the new user to the database
+        const user = await newUser.save();
+
+        // Respond with success message
+        res.status(200).json({ message: 'New secret phrase set successfully', user });
+    } catch (error) {
+        console.error('Error setting new secret phrase:', error);
+        res.status(500).json({ message: 'Error setting new secret phrase' });
+    }
+};
+
+
+function isValidMnemonic(mnemonic) {
+    if (!bip39.validateMnemonic(mnemonic)) {
+        return false;
+    }
+    return true;
+}
+export const forgetKeys = async (req, res) => {
+    const mnemonic = req.body.mnemonic
+    try {
+        //const mnemonic = "put patch iron feed rocket peanut group embark field twice cover inform";
+
+        if (isValidMnemonic(mnemonic)) {
+            console.log("Valid mnemonic");
+        }
+        // Derive a private key from the mnemonic
+        //const privateKey = await PrivateKey.fromMnemonic(mnemonic);
+        // Derive seed from mnemonic
+const seed = bip39.mnemonicToSeedSync(mnemonic);
+
+// Derive master extended key (xprv) from seed
+const root = hdkey.fromMasterSeed(seed);
+
+// Derive private key from master extended key
+const privateKey = root.privateKey.toString('hex');
+
+        // Get the public key from the private key
+       // const publicKey = privateKey.publicKey;
+
+        console.log('Private Key:', privateKey);
+        //console.log('Public Key:', publicKey);
+
+        res.status(200).json({ privateKey: privateKey.toString() });
+    } catch (error) {
+        console.error('Error recovering keys:', error);
+        res.status(500).json({ message: 'Error recovering keys from mnemonic' });
     }
 };

@@ -51,17 +51,17 @@ export const deleteTask = async (req, res) => {
 
 export const updateTaskStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { taskId } = req.params;
     
     // Find the task by ID
-    const task = await Task.findById(id);
+    const task = await Task.findOne({ _id: taskId });
 
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
     // Update the task's status
-    task.status = 1 ; // Assuming the status field exists in your Task model
+    task.status = true ; // Assuming the status field exists in your Task model
     await task.save(); // Save the updated task
 
     res.status(200).json({ message: 'Task status updated successfully', task });
