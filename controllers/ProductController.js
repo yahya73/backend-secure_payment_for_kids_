@@ -1,31 +1,7 @@
 import { validationResult } from 'express-validator';
 import Product from "../models/product.js";
-import admin from 'firebase-admin';
-admin.initializeApp({
-    credential: admin.credential.cert('./firebase-admin-config.json'), // Provide the path to your service account key JSON file
-  });
-  const db = admin.firestore();
-  async function sendNotification(message, token) {
-    try {
-        // Send the notification
-        await admin.messaging().send({
-            notification: {
-                title: message.title,
-                body: message.body,
-            },
-            token: token,
-        });
-     console.log("notification",message);
-        await db.collection('notifications').add({
-            title: message.title,
-            body: message.body,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        });
-    } catch (err) {
-        console.log(err);
-        throw new Error('Failed to send notification');
-    }
-}
+import {sendNotification} from "./notificationController.js"
+
 
 // Controller function to create a new product
 // Controller function to create a new product

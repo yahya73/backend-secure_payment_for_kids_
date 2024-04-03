@@ -1,12 +1,44 @@
 import Notification from '../models/notification.js';
+import admin from 'firebase-admin';
+admin.initializeApp({
+    credential: admin.credential.cert('./firebase-admin-config.json'), // Provide the path to your service account key JSON file
+  });
 
 global.tokendevice  
+const db = admin.firestore();
+export async function sendNotification(message, token) {
+  try {
+      // Send the notification
+      await admin.messaging().send({
+          notification: {
+              title: message.title,
+              body: message.body,
+          },
+          token: token,
+      });
+   console.log("notification",message);
+      await db.collection('notifications').add({
+          title: message.title,
+          body: message.body,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      });
+  } catch (err) {
+      console.log(err);
+      throw new Error('Failed to send notification');
+  }
+}
   export  async function createNotification(req, res) {
     const notification = req.body;
     try {
       const notification2 = new Notification(
        notification);
       const savedNotification = await notification2.save();
+      const message = {
+        title: savedNotification.type,
+        body: savedNotification.content,
+    };
+    const token = global.tokendevice;
+    await sendNotification(message, token);
       res.status(201).json(savedNotification);
     } catch (error) {
       console.error('Error creating notification:', error);
