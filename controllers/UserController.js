@@ -440,7 +440,7 @@ const sendPasswordResetEmail = async (req, res) => {
   const { email } = req.body; // Assuming you're sending the email address in the request body
 
   try {
-    const user = await User.findOne({ Email: email });
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
