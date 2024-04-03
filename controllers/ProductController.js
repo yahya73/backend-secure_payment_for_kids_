@@ -15,8 +15,7 @@ admin.initializeApp({
             },
             token: token,
         });
-
-        // Store notification data in Cloud Firestore
+     console.log("notification",message);
         await db.collection('notifications').add({
             title: message.title,
             body: message.body,
@@ -102,35 +101,23 @@ export function getOneById(req, res) {
 
 export async function deleteProduct(req, res) {
     try {
-        // Find the product by ID and delete it from the database
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-
-        // Check if the product exists
         if (!deletedProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
-
-        // Prepare notification message
         const message = {
             title: 'Product Deleted',
             body: `The product ${deletedProduct.productName} has been deleted`,
         };
-
-        // Token for the device to send notification
-        const token = 'eJ4RjaRtSIK7UI-EjuTtq7:APA91bFuKfbMooXj6N-2hvxjI0RoPIdcAN65wo01trY9tnkSJ61i2BvIYvbVwEYGHrzErXAu3QV0IKhn_lvKR8bM8Iz9LdIG7HmGOvDp19gK5me-B2MnQGDgMrOjOoF_wA0BTnreGOKQ';
-        console.log(token);
+        const token = global.tokendevice;
         await sendNotification(message, token);
-
-        // Respond with 200 OK and a success message
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (err) {
         console.log(err);
-        // Respond with 500 Internal Server Error and the error details
         res.status(500).json({ error: err.message });
     }
 }
 
-// Create a new product
 const addProduct = async (req, res) => {
     try {
         const product = await Product.create(req.body);

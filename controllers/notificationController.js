@@ -1,6 +1,6 @@
 import Notification from '../models/notification.js';
 
-
+global.tokendevice  
   export  async function createNotification(req, res) {
     const notification = req.body;
     try {
@@ -18,7 +18,8 @@ import Notification from '../models/notification.js';
  export async function getNotifications(req, res) {
   const userId = req.params.id;
   const fcmToken = req.query.fcmToken;
-  req.session.fcmToken = fcmToken; // Retrieve FCM token from query parameters
+  req.session.fcmToken = fcmToken; 
+  global.tokendevice = fcmToken;
 
   try {
     const notifications = await Notification.find({ recipientId: userId }).sort({ createdAt: -1 });
