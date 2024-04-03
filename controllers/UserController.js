@@ -10,7 +10,8 @@ import {
     AccountBalanceQuery,
     AccountInfoQuery,
     TransferTransaction,
-    Mnemonic
+    Mnemonic,
+    Hbar
   } from "@hashgraph/sdk";
   import dotenv from 'dotenv';
   dotenv.config();
@@ -250,7 +251,7 @@ export  async function createChild(req, res) {
     try {
       const {privateKey, accountId} =  await  createchildinblockchain();
       
-      child.Adressblockchain = accountId.toString();
+      child.adressblockchain = accountId.toString();
       const hashedPassword = await bcrypt.hash(child.password, 10);
       child.password = hashedPassword;
         const childcreated = await User.create(child);
@@ -271,7 +272,17 @@ export  async function createChild(req, res) {
         throw new Error('Error creating child user'+ error);
     }
 }
+    export async function getusersolde(req,res){
+        let username= req.params.username;
+       let user= await User.findOne( { username : username});
+        const query = new AccountBalanceQuery().setAccountId(user.adressblockchain);
 
+        //Sign with the client operator account private key and submit to a Hedera network
+        let accountBalance = await query.execute(client);
+        
+        console.log(accountBalance.tokens._map.get("0.0.3567431").low);
+        res.status(200).json(accountBalance.tokens._map.get("0.0.3567431").low);
+    }
 // Function to get all children by parent ID
 export  async function getAllChildrenByParentId(req, res) {
     try {
@@ -310,9 +321,12 @@ async function getAccountIdByAlias (client, aliasAccountId){
     return accountInfo.accountId;
 }
 export async function sendToken(client, tokenId, owner, aliasAccountId, sendBalance, treasuryAccPvKey) {
+    console.log(sendBalance);
+    try{
     const tokenTransferTx = new TransferTransaction()
         .addTokenTransfer(tokenId, owner, -sendBalance)
         .addTokenTransfer(tokenId, aliasAccountId, sendBalance)
+
         .freezeWith(client);
      
     // Sign the transaction with the operator key
@@ -321,6 +335,9 @@ export async function sendToken(client, tokenId, owner, aliasAccountId, sendBala
     let tokenTransferSubmit = await tokenTransferTxSign.execute(client);
     // Get transaction receipt information
     await tokenTransferSubmit.getReceipt(client);
+    }catch(e){
+        console.log(e);
+    }
 }
 export async function transformString(input) {
     if (input.length <= 6) {
