@@ -1,18 +1,26 @@
 import mongoose from "mongoose";
 const { Schema, model } = mongoose;
-
+import User from "./User.js";
+import Reel from "./reel.js";
 
 const reportSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  username: {
+    type: String, // Corrected reference to User schema
     required: true
   },
-  reportedVideo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Reel', 
-    required: true
-  },
+  email:{
+    type: String,
+    
+},
+
+// Defining a field 'image' of type String, which is required
+image: {
+    type: String,
+  
+},
+  reportedVideo:  { type: String, required: true },
+  userNameReel: { type: String, required: true },
+  reelDescription: { type: String },
   reportType: {
     type: String,
     required: true
@@ -22,6 +30,5 @@ const reportSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 
 export default model('Report', reportSchema);
