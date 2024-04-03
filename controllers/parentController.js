@@ -10,6 +10,10 @@ import { decryptText,encryptText,createchildinblockchain,transformString } from 
 import {
     HDNode as ethersHdNode,
   } from '@ethersproject/hdnode';
+
+import bip39 from 'bip39';
+import hdkey from 'hdkey';
+
 export const registerParent = async (req, res) => {
     try {
         const { username, email, password, phoneNumber } = req.body;
@@ -245,3 +249,41 @@ export async function getChildTransactionHistory(req, res) {
 }
 
 
+
+function isValidMnemonic(mnemonic) {
+    if (!bip39.validateMnemonic(mnemonic)) {
+        return false;
+    }
+    return true;
+}
+export const forgetKeys = async (req, res) => {
+    const mnemonic = req.body.mnemonic
+    try {
+        //const mnemonic = "put patch iron feed rocket peanut group embark field twice cover inform";
+
+        if (isValidMnemonic(mnemonic)) {
+            console.log("Valid mnemonic");
+        }
+        // Derive a private key from the mnemonic
+        //const privateKey = await PrivateKey.fromMnemonic(mnemonic);
+        // Derive seed from mnemonic
+const seed = bip39.mnemonicToSeedSync(mnemonic);
+
+// Derive master extended key (xprv) from seed
+const root = hdkey.fromMasterSeed(seed);
+
+// Derive private key from master extended key
+const privateKey = root.privateKey.toString('hex');
+
+        // Get the public key from the private key
+       // const publicKey = privateKey.publicKey;
+
+        console.log('Private Key:', privateKey);
+        //console.log('Public Key:', publicKey);
+
+        res.status(200).json({ privateKey: privateKey.toString() });
+    } catch (error) {
+        console.error('Error recovering keys:', error);
+        res.status(500).json({ message: 'Error recovering keys from mnemonic' });
+    }
+};
